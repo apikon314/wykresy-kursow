@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Dynamic Stock Graphs</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 40px;
+            background: #f8f8f8;
+        }
+        .input-section {
+            margin-bottom: 24px;
+            background: #fff;
+            padding: 18px 24px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            max-width: 900px;
+        }
+        .periods-section {
+            margin-bottom: 24px;
+            padding: 14px 24px;
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            max-width: 900px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+        .period-link {
+            padding: 7px 18px;
+            border-radius: 4px;
+            border: 1px solid #0057b8;
+            background: #fff;
+            color: #0057b8;
+            text-decoration: none;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background 0.2s, color 0.2s;
+        }
+        .period-link.selected, .period-link:hover {
+            background: #0057b8;
+            color: #fff;
+        }
+        .graphs-flex {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 24px;
+            justify-content: flex-start;
+        }
+        .graph-container {
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            padding: 16px;
+            max-width: 320px;
+            min-width: 260px;
+            flex: 1 1 300px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        h2 {
+            margin-top: 0;
+            font-size: 1.1em;
+            margin-bottom: 12px;
+        }
+        img {
+            width: 100%;
+            max-width: 280px;
+            display: block;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        label, input, button {
+            font-size: 1rem;
+        }
+        input {
+            width: 350px;
+            padding: 6px;
+            margin-right: 8px;
+        }
+        button {
+            padding: 6px 18px;
+            background: #0057b8;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        button:hover {
+            background: #003e87;
+        }
+        @media (max-width: 900px) {
+            .graphs-flex {
+                gap: 12px;
+            }
+            .graph-container {
+                max-width: 46vw;
+                min-width: 180px;
+            }
+        }
+        @media (max-width: 600px) {
+            .graphs-flex {
+                flex-direction: column;
+                gap: 16px;
+            }
+            .graph-container {
+                max-width: 100%;
+            }
+            input {
+                width: 90vw;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="input-section">
+        <label for="symbols">Enter stock symbols (separated by ;): </label>
+        
+        <input type="text" id="symbols" value="peo;asme.de;nvda.us;amzn.us">
+        
+        <button onclick="showGraphs()">Show Graphs</button>
+    </div>
+    <div class="periods-section" id="periods">
+        <span>Choose period:</span>
+        <!-- Period buttons will be generated here -->
+    </div>
+    <div id="graphs" class="graphs-flex"></div>
+
+    <script>
+        const periods = [
+            {label: "1d", value: "1d"},
+            {label: "5d", value: "5d"},
+            {label: "10d", value: "10d"},
+            {label: "1m", value: "1m"},
+            {label: "3m", value: "3m"},
+            {label: "1y", value: "1y"}
+        ];
+        let selectedPeriod = "1y";
+
+        function createPeriodLinks() {
+            const periodsDiv = document.getElementById('periods');
+            periodsDiv.innerHTML = '<span>Choose period:</span>';
+            periods.forEach(period => {
+                const btn = document.createElement('a');
+                btn.textContent = period.label;
+                btn.href = "#";
+                btn.className = "period-link" + (period.value === selectedPeriod ? " selected" : "");
+                btn.onclick = (e) => {
+                    e.preventDefault();
+                    selectedPeriod = period.value;
+                    createPeriodLinks();
+                    showGraphs();
+                };
+                periodsDiv.appendChild(btn);
+            });
+        }
+
+        function showGraphs() {
+            const input = document.getElementById('symbols').value;
+            const symbols = input.split(';').map(s => s.trim()).filter(s => s.length > 0);
+            const graphsDiv = document.getElementById('graphs');
+            graphsDiv.innerHTML = '';
+
+            if (symbols.length === 0) {
+                graphsDiv.innerHTML = '<p>No symbols entered.</p>';
+                return;
+            }
+
+            symbols.forEach(symbol => {
+                const displaySymbol = symbol.toUpperCase();
+                const container = document.createElement('div');
+                container.className = 'graph-container';
+
+                const title = document.createElement('h2');
+                title.textContent = displaySymbol;
+                container.appendChild(title);
+
+                const img = document.createElement('img');
+                img.src = `https://stooq.pl/c/?s=${symbol}&c=${selectedPeriod}&t=l&a=lg`;
+                img.alt = `${displaySymbol} stock graph`;
+                container.appendChild(img);
+
+                graphsDiv.appendChild(container);
+            });
+        }
+
+        // On page load
+        window.onload = function() {
+            createPeriodLinks();
+            showGraphs();
+        };
+    </script>
+</body>
+</html>
