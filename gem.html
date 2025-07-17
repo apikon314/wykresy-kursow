@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Stooq Chart (Last Day of Previous Month)</title>
+</head>
+<body>
+  <a id="stooq-link" href="#" target="_blank">Go to Stooq Chart</a>
+  <script>
+    // Get today's date
+    const today = new Date();
+    // Set to first day of this month, then subtract one day
+    const lastDayPrevMonth = new Date(today.getFullYear(), today.getMonth(), 0);
+    const y = lastDayPrevMonth.getFullYear();
+    const m = String(lastDayPrevMonth.getMonth() + 1).padStart(2, '0');
+    const d = String(lastDayPrevMonth.getDate()).padStart(2, '0');
+    const dateStr = `${y}${m}${d}`;
+
+    // Compose and set the link
+    const href = `https://stooq.pl/q/?s=eimi.uk&d=${dateStr}&c=1y&t=l&a=lg&b=1&r=iwda.uk+cbu0.uk+ib01.uk+cndx.uk+cspx.uk`;
+    document.getElementById('stooq-link').href = href;
+  </script>
+</body>
+</html>
